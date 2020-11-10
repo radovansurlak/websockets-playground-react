@@ -1,25 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
 
-function App() {
+import openSocket from "socket.io-client";
+const socket = openSocket("localhost:8080");
+
+export default function App() {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+
+  socket.on("message", (data) => {
+    setMessages([...messages, data]);
+  });
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Hello from realtime chat</h1>
+      <input
+        type="text"
+        value={input}
+        onChange={(event) => setInput(event.target.value)}
+      />
+      {messages.map((message) => (
+        <p>{message}</p>
+      ))}
+
+      <button onClick={() => socket.emit("newMessage", input)}>emit </button>
     </div>
   );
 }
-
-export default App;
